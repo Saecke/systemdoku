@@ -37,4 +37,4 @@ IDs, IPs und Credentials in dieser Dokumentation sind durch Platzhalter ersetzt 
 
 ---
 
-*Dokumentation erstellt mit Unterstützung von Claude (Anthropic).*
+*Die Dokumentation wurde erstellt mit Unterstützung von Claude (Anthropic).*

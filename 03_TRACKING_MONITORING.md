@@ -104,6 +104,27 @@ Tracking und Monitoring decken die Echtzeit-Überwachung des Servers ab: Spieler
 
 ---
 
+### trackingstation.py (Cog)
+**Spieler- & Flaggen-Tracking** — Phrasen-Weiterleitung, verdächtige Neuzugänge und Flaggenüberwachung.
+
+- **Feature 1: Phrasen-Tracking** — Kanalnamen der Tracking-Kategorie dienen als Trigger-Phrasen. Nachrichten aus Quellkanälen, die eine Phrase enthalten, werden in den passenden Tracking-Kanal weitergeleitet.
+- **Feature 2: New-Player-Tracking** — Reagiert auf "New player"-JSON. Bei VAC-Ban, Community-Ban, Economy-Ban oder Game-Bans wird automatisch ein Tracking-Kanal (SteamID als Name) in der Kategorie erstellt.
+- **Feature 3: Flaggen-Checks** — Basebuilding-Logs ("Gebaut."/"Zerstört.") werden auf Bauverbotszonen geprüft (via MapTools, optional). Bei Verstoß: Reaktion + Ping an Moderatoren.
+- **Feature 4: Flaggen-DB-Sync** — Verarbeitet `serverlogs/flagtracking/*.log` (Created/Destroyed/Overtaken) in `flags.db`. Zusätzlich: Snapshot-Sync aus `flags.txt` mit Plausibilitätsprüfung (>30%-Rückgang wird übersprungen).
+- **Tasks:** `check_channel_names` (30s), `process_flagtracking` (30s)
+- **Befehl:** `!tracking-diag` — Supervisor-only Diagnose (Kategorie, Phrasen, Loops, Pfade)
+- **Konfiguration:** `cfg.tracking` mit Fallback auf `ini/bot_tracker.ini` (Legacy)
+- **Kategorie-Autodiscovery:** Findet die Tracking-Kategorie automatisch, wenn keine ID konfiguriert ist (sucht nach "tracking"/"track"/"flagtracking")
+
+| Ressource | Zugriff |
+|---|---|
+| `flags.db` (flags) | Lesen + Schreiben |
+| `serverlogs/flagtracking/*.log` | Lesen + Löschen nach Verarbeitung |
+| `ini/flags.txt` | Lesen (autoritativer Snapshot) |
+| `ini/bot_tracker.ini` | Lesen (Legacy-Fallback) |
+
+---
+
 ### health.py (Cog)
 **System-Diagnose** — Supervisor-only Health-Check.
 
@@ -129,7 +150,13 @@ Spielserver
     ├── BattleMetrics API ──→ server_status.py → Status-Embed + Bot-Presence
     │   PP-Logcrawler INIs ─┘
     │
-    └── Voice-Kanäle → voice_rewards.py → userstats.db → bank.db (Gold)
+    ├── Voice-Kanäle → voice_rewards.py → userstats.db → bank.db (Gold)
+    │
+    ├── Log-Kanäle → trackingstation.py ─┬→ Phrasen-Tracking → Tracking-Kategorie
+    │   New-Player-JSON ─┘               ├→ New-Player → Tracking-Kanal (SteamID)
+    │   Basebuilding-Logs ─┘             └→ Flaggen-Check (MapTools) + flags.db
+    │   flagtracking/*.log ─┘
+    │   flags.txt ─┘
 
 health.py ← introspiziert alle Cogs + DBs + HTTP-Monitor
 ```
@@ -140,3 +167,4 @@ health.py ← introspiziert alle Cogs + DBs + HTTP-Monitor
 - **steam_watch.py** liest aus `userdata.db` (Spieler-Identity)
 - **server_status.py** liest aus dem `PP-Live-Logcrawler` (Externes Tool)
 - **statbot.py** nutzt `http_monitor` (Kern-Infrastruktur)
+- **trackingstation.py** nutzt `MapTools` (optional, für Bauverbotszonen-Prüfung)

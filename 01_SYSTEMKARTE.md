@@ -198,7 +198,7 @@ Der Haupt-Bot lädt alle Cogs aus `_cogs/`. Gruppiert nach Funktion:
 ### Tracking & Monitoring
 | Cog | Funktion |
 |---|---|
-| `trackingstation.py` | Flaggen-Tracking: `flags.txt` -> `flags.db` + Event-Logs |
+| `trackingstation.py` | Phrasen-Tracking (Kanalnamen als Trigger), New-Player-Tracking (VAC/Ban → Auto-Kanal), Flaggen-Checks (Bauverbotszonen via MapTools) + `flags.db`-Sync |
 | `statbot.py` | Spielerstatistiken -> `statbot.db`, `userstats.db` |
 | `kill_feed.py` | Kill-Feed-Verarbeitung |
 | `server_status.py` | Serverstatus-Anzeige |

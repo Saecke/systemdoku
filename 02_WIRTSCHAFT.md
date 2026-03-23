@@ -60,18 +60,33 @@ Reine Analytik — kein Einfluss auf Kontostände.
 ---
 
 ### insurance.py + check_insurance.py (Cogs)
-**Fahrzeugversicherung** — KFZ-Verwaltung mit Despawn-Countdown.
+**Fahrzeugversicherung & Fahrzeugübersicht** — KFZ-Verwaltung mit Despawn-Countdown.
 
-- **Befehl:** `/kfz` (Aliases: auto, car) — zeigt Versicherungsdetails (DM)
+- **Befehl:** `/kfz` (Aliases: auto, car) — zeigt Fahrzeuginfos (DM)
+  - **Versicherte:** Versicherungsdetails + Despawn-Countdown + alle Fahrzeuge auf ihren Namen
+  - **Nicht versichert, aber verlinkt:** Alle abgeschlossenen Fahrzeuge (via owner_steam_id/owner_db_id aus carservice.db)
+  - **Fahrzeuglimit-Warnungen:** 2 ohne Lizenz, 3 mit Fuhrpark-Lizenz (l2), 5+ = schwerer Regelverstoß
+  - **Hinweise:** Abgelaufene Lizenz → `/lizenzen` erneuern; Keine Versicherung → `/tresor` kaufen
 - **Admin:** `/vers add/rem/list` — Versicherungsnummern (V#####) zuweisen/entfernen
 - **Background:** Pollt `act_cars.txt` alle 5 Min + File-Monitor alle 5 Sek
-- **Features:** Despawn-Countdown, Kartenlink (scum-map.com), Fahrzeughistorie
+- **Features:** Despawn-Countdown, Kartenlinks (scum-map.com) pro Fahrzeug, Fahrzeughistorie
+- **Fahrzeug-Mappings:** Rager, WolfsWagen, Laika, Dirtbike, Cruiser, RIS, Traktor, Citybike, Mountainbike, Barba, Dinghy, Floß, Sidecar, Kinglet Duster, Kinglet Mariner
 
 | DB | Tabellen | Zugriff |
 |---|---|---|
-| `userdata.db` | insurance_id, vehicle_* Spalten | Lesen + Schreiben |
-| `carservice.db` | vehicle_history, events, vehicles | Lesen (Historie) |
-| `act_cars.txt` | Aktive Fahrzeuge (Datei) | Lesen |
+| `userdata.db` | insurance_id, steam_id, gamer_id, vehicle_* Spalten | Lesen + Schreiben |
+| `carservice.db` | vehicle_history, events, vehicles (owner_steam_id, owner_db_id) | Lesen (Fahrzeuge + Historie) |
+| `bank.db` | Lizenzen (l2 = Fuhrpark-Lizenz) | Lesen (Lizenz-Check) |
+| `act_cars.txt` | Aktive Fahrzeuge (Datei, deutsche Lokalzeit trotz Z-Suffix) | Lesen |
+
+### vehicle_monitor.py (Cog)
+**Fahrzeuglimit-Monitor** — postet Verstöße automatisch in einen Admin-Channel.
+
+- **Trigger:** Änderung an `act_cars.txt`, max. 1x pro Stunde
+- **Logik:** Gruppiert alle Fahrzeuge pro Owner aus carservice.db, prüft Fuhrpark-Lizenz (l2) aus bank.db
+- **Verstöße:** >2 Fahrzeuge ohne Lizenz, >3 mit Lizenz, 5+ = schwerer Regelverstoß
+- **Ausgabe:** Embed in Admin-Channel mit Spielername, SteamID, Lizenzstatus, Fahrzeugliste
+- **Channel:** `cfg.discord_conf.channels.vehicle_monitor`
 
 ---
 

@@ -27,7 +27,7 @@ Alles rund um Gold, Handel und Zahlungen.
 - **bank.py + bank_db.py:** Tresor-System, Ein-/Auszahlung, Standortprüfung, 24h-Cooldown, Banksperre (Lock-File)
 - **handelshaus.py:** Forum-basiertes Auktionshaus, Snipe-Schutz, Gebots-Staffelung, Rollen-basierte Limits
 - **trade_stats.py:** Parst `[Trade]`-Logs → `trades.db` (Analytik, kein Gold-Einfluss)
-- **insurance.py + check_insurance.py:** KFZ-Versicherung, V-Nummern, Despawn-Countdown, Fahrzeughistorie
+- **insurance.py + check_insurance.py:** KFZ-Versicherung & Fahrzeugübersicht, V-Nummern, Despawn-Countdown, Fahrzeughistorie, Owner-Fahrzeuge (auch für Nicht-Versicherte), Fuhrpark-Lizenz-Warnungen
 - **lizenzen.py:** 3 Lizenztypen (Banker/Fleet/Bau), 7-Tage-Laufzeit, Gold-Abzug
 - **donations.py:** PayPal→payment.db, Sponsor-Rolle (30 Cent = 1 Tag), Stammtisch permanent
 - DB-Schemas: bank.db (Konten, Aktionen, Lizenzen, Benutzeraktionen), handelshaus.db, trades.db, donations.db
@@ -254,8 +254,9 @@ Alle Cogs werden dynamisch über `_modules/loader.py` geladen und können einzel
 | Bank | bank.py | Gold-Tresor, Ein-/Auszahlung, Standortprüfung | [02](02_WIRTSCHAFT.md) |
 | Handelshaus | handelshaus.py | Auktionshaus mit Snipe-Schutz | [02](02_WIRTSCHAFT.md) |
 | TradeStats | trade_stats.py | Trade-Log-Parsing → Analytik-DB | [02](02_WIRTSCHAFT.md) |
-| Insurance | insurance.py | KFZ-Versicherung, Despawn-Countdown | [02](02_WIRTSCHAFT.md) |
+| Insurance | insurance.py | KFZ-Versicherung & Fahrzeugübersicht, Despawn, Owner-Fahrzeuge, Lizenz-Warnungen | [02](02_WIRTSCHAFT.md) |
 | CheckInsurance | check_insurance.py | Admin: V-Nummern zuweisen/entfernen | [02](02_WIRTSCHAFT.md) |
+| VehicleMonitor | vehicle_monitor.py | Automatischer Fahrzeuglimit-Monitor → Admin-Channel (max 1x/h) | [02](02_WIRTSCHAFT.md) |
 | Lizenzen | lizenzen.py | Banker/Fleet/Bau-Lizenzen kaufen | [02](02_WIRTSCHAFT.md) |
 | Donations | donations.py | PayPal-Spenden, Sponsor-Rollen | [02](02_WIRTSCHAFT.md) |
 

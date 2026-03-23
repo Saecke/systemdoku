@@ -41,7 +41,7 @@ Alle Spieler-Interaktionen laufen über Discord (Befehle, Buttons, Dropdowns) od
 |---|---|---|---|
 | `/tresor` | Bank, bank, t, T | bank.py | Gold-Kontostand, letzte 20 Transaktionen, Voice-Reward-Status |
 | `/lizenzen` | license, lizenz, l, L | lizenzen.py | Aktive Lizenzen, Kaufmenü per Reaktion (💳🚗🏗️) |
-| `/kfz` | auto, car, Car, KFZ | insurance.py | Fahrzeugtyp, ID, Koordinaten, Despawn-Countdown, Versicherungsstatus |
+| `/kfz` | auto, car, Car, KFZ | insurance.py | Fahrzeugtyp, ID, Kartenlinks, Despawn-Countdown, Versicherungsstatus, alle Fahrzeuge auf dem Namen, Fuhrpark-Lizenz-Warnungen (2/3/5+), `/tresor`-Hinweis für Nicht-Versicherte |
 | `/flugzeug` | plane, flieger, Flieger | aircraft.py | Flugzeug-Auswahl, Preise, Kauf-Flow (Standort-Prüfung + Gold abziehen) |
 | `/spende` | spenden | donations.py | Spendenguide, PayPal-Link, Transaktions-ID einlösen |
 
@@ -126,7 +126,7 @@ Text-Befehle im eigenen Voice-Channel-Text:
 |---|---|---|
 | /profil | Name, Steam-ID, Counter, Handelsvolumen, Tickets, Basisattribute | userdata, lottery, event_stats, persistent_stats |
 | /squad | Mitglieder, Ränge, Tresor, Purge-Status, Kontostand | userdata, squaddata, bank |
-| /kfz | Fahrzeugtyp, Koordinaten, Despawn-Countdown | userdata |
+| /kfz | Fahrzeugtyp, Koordinaten, Kartenlinks, Despawn-Countdown, alle Fahrzeuge, Lizenz-Warnungen | userdata, carservice, bank |
 | /char | 7 Stat-Kategorien, 50+ Werte, Kronen (👑) | persistent_stats |
 | /chars | Server-Leaderboards für alle Kategorien | persistent_stats |
 | /charx | Eigene Werte vs. Server-Top, Rang-Perzentil | persistent_stats, userdata |

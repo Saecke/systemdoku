@@ -65,17 +65,33 @@ Das Dashboard unter `scumsaecke.de/dash/` ist eine **rein lesende Visualisierung
 
 ---
 
-### /kfz — Fahrzeugversicherung
-**Was der Spieler sieht:**
-- Fahrzeugtyp (Rager, WolfsWagen, Laika, etc.)
-- Fahrzeug-ID, Koordinaten
-- Letzte Synchronisation (Datum/Uhrzeit)
-- Despawn-Countdown (14 Tage ab Sync)
-- Versicherungsstatus
+### /kfz — Fahrzeugversicherung & Fahrzeugübersicht
+**Was der Spieler sieht (je nach Status):**
+
+**Versichert mit aktivem Fahrzeug:**
+- Versicherungsnummer, Fahrzeug-ID, Fahrzeugtyp (15 Typen gemappt)
+- Despawn-Countdown, Kartenlink (scum-map.com)
+- Fahrzeug-Historie (Events, letzte 10)
+- Versicherte Fahrzeuge unter der V-Nummer (letzte 10)
+- Alle Fahrzeuge auf dem Spieler-Namen (aktiv, mit Kartenlinks)
+- Fuhrpark-Lizenz-Warnungen (2 ohne Lizenz, 3 mit l2, 5+ = schwerer Verstoß)
+
+**Versichert ohne aktives Fahrzeug:**
+- Versicherungsnummer + Hinweis "kein Fahrzeug zugewiesen"
+- Alle Fahrzeuge auf dem Spieler-Namen (via owner_steam_id/owner_db_id)
+- Kartenlinks pro Fahrzeug, Lizenz-Warnungen
+
+**Nicht versichert, aber verlinkt:**
+- Alle abgeschlossenen Fahrzeuge auf dem Namen (Typ, Zuletzt benutzt, Kartenlink)
+- Hinweis: Versicherung über `/tresor` erhältlich
+- Lizenz-Warnungen bei zu vielen Fahrzeugen
 
 | Datenquelle | Tabelle | Felder |
 |---|---|---|
-| `userdata.db` | userdata | insurance_id, vehicle_id, vehicle_type, vehicle_date/time, vehicle_coord_x/y/z |
+| `userdata.db` | userdata | insurance_id, steam_id, gamer_id, vehicle_* |
+| `carservice.db` | vehicles | owner_steam_id, owner_db_id, class, last_seen_ts, x/y/z |
+| `carservice.db` | vehicle_history, events | Fahrzeug-Historie |
+| `bank.db` | Lizenzen | l2 (Fuhrpark-Lizenz, Unix-Timestamp) |
 
 ---
 

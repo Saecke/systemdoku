@@ -35,12 +35,15 @@ Event-Buffer (TTL pro Quelle)
     ↓
 Baseline-Filter (alle 120s)
     → Lernphase (24h): alles durchlassen
+    → Event-Typ-Klassifizierung (buy/sell, login/logout etc.)
     → Danach: nur Anomalien + kritische Events
+    → Source-Level: Quelle insgesamt >3x → alles durch
+    → Restart-Grace: login/violations nach Restart toleriert
     ↓
 Log-Analyzer (LLM mit MONITOR_PROMPT + Tools)
-    → "KEINE_AUFFAELLIGKEITEN" oder Befund
-    ↓
-Discord-Alert im Alert-Kanal
+    → Deduplizierung: nur neue Events + max 25 Kontext-Zeilen
+    → "KEINE_AUFFAELLIGKEITEN" → Status-Meldung
+    → Befund → Discord-Alert im Alert-Kanal
 ```
 
 ---
@@ -105,12 +108,15 @@ Discord-Alert im Alert-Kanal
 | learning_hours | 24 |
 | anomaly_threshold | 3.0 (3x über Baseline = Anomalie) |
 | ignored_players | ["<BOT_STEAM_ID>"] (Inselkom-Bot) |
+| restart_times | ["03:00", "09:00", "15:00", "21:00"] |
+| restart_grace_minutes | 10 |
+| restart_grace_sources | ["login.log", "violations.log"] |
 
 ### Monitor-Quellen (10 Stück)
 
 | Datei | TTL | Keep-Patterns |
 |---|---|---|
-| SCUM.log | 300s | battleye, ddos, ban, kick, cheat, hack, exploit |
+| SCUM.log | 300s | battleye, ddos, ban, kick, cheat, tps, fps, global stats, error, crash etc. |
 | economy.log | 900s | — (alles) |
 | login.log | 600s | — |
 | chat.log | 600s | — |
@@ -165,23 +171,48 @@ Discord-Alert im Alert-Kanal
 
 ### Lernphase (24h)
 - Alle Events durchlassen
-- EMA (α=0.1) lernt Durchschnittswerte pro Spieler pro Log-Quelle
+- EMA (α=0.1) lernt Durchschnittswerte pro Spieler pro Log-Quelle **und pro Event-Typ**
 - Baseline wird in `monitor_baseline.json` persistiert
 
+### Event-Typ-Tracking
+Baseline klassifiziert Events automatisch:
+
+| Quelle | Typen |
+|--------|-------|
+| economy.log | buy (purchased by), sell (sold by) |
+| login.log | login, logout |
+| chest_ownership.log | claim, change |
+| quests.log | complete, abandon |
+| vehicle_destruction.log | destroyed, disappeared |
+| gameplay.log | lockpick, flag_create, flag_destroy |
+
+Wird pro Spieler+Quelle+Typ als EMA getrackt → "Spieler hat 6x mehr Verkäufe als normal"
+
 ### Nach der Lernphase
-- Vergleich: aktuelle Aktivität vs. gelernte Baseline
-- Anomalie wenn: `count / avg >= anomaly_threshold` (3.0x)
+- **Spieler-Level:** `count / avg >= anomaly_threshold` (3.0x) → Anomalie, mit Typ-Aufschlüsselung
+- **Source-Level:** Quelle insgesamt >= threshold → ALLE Events durchlassen
 - Unbekannte Spieler mit ≥8 Events = auch Anomalie
 - **Immer alarmieren:** battleye, ban, ddos, kick, cheat, hack, exploit
+
+### Restart-Grace-Period
+- Konfigurierbare Serverneustart-Zeiten (03:00, 09:00, 15:00, 21:00)
+- Für 10 Min danach: login.log + violations.log Spikes werden toleriert (SCUM lässt nur 6–10 Spieler/Min rein, bis 80 warten)
+- **AUSSERHALB** der Restart-Zeiten: Login-Spike = besonders verdächtig → Hinweis auf Serverprobleme/Absturz
+
+### Deduplizierung (Analyzer)
+- **Event-Level:** Bereits analysierte Events werden nicht erneut gesendet, max 25 Kontext-Zeilen
+- **Alert-Level:** Gemeldete Spieler bekommen 30 Min Cooldown. LLM wird informiert, diese nicht erneut zu melden (außer bei neuem, anderem Vergehen). Verhindert Alarm-Spam.
+- "Keine Auffälligkeiten" → kurze Status-Meldung im Channel (statt Stille)
 
 ### Was KEIN Alarm ist (im MONITOR_PROMPT definiert)
 - Häufige Logins/Logouts (SCUM crasht oft)
 - Bulk-Käufe/Verkäufe (jedes Item = 1 Zeile)
+- Verschiedene Items bei verschiedenen Händlern kaufen/verkaufen = normales Einkaufen
 - Hohe Kontostände
 - Spieler handeln im Chat (keine Spam-Meldung)
 
 ### Was ein Alarm ist
-- Arbitrage: Kaufen bei Händler A, Verkaufen bei Händler B, wiederholen
+- Arbitrage: **Exakt gleiches Item** kaufen bei Händler A, verkaufen bei Händler B, wiederholt (alle 3 Bedingungen!)
 - BattlEye-Kicks/Bans
 - DDoS-Warnungen
 - Beleidigungen/Spam/Serverwerbung im Chat
@@ -194,27 +225,35 @@ Discord-Alert im Alert-Kanal
 {
   "meta": { "started": "...", "updated": "..." },
   "sources": {
-    "economy.log": { "avg": 91.5, "samples": 5 },
-    "chat.log": { "avg": 72.7, "samples": 5 },
-    "SCUM.log": { "avg": 757.3, "samples": 5 }
+    "economy.log": {
+      "avg": 91.5, "samples": 5,
+      "types": { "buy": { "avg": 45.0, "samples": 5 }, "sell": { "avg": 30.0, "samples": 5 } }
+    }
   },
   "players": {
     "<PLAYER_STEAM_ID>": {
       "last_seen": "...",
-      "activity": { "chat.log": { "avg": 4.6, "samples": 2 } }
+      "activity": {
+        "economy.log": {
+          "avg": 4.6, "samples": 10,
+          "types": { "buy": { "avg": 2.5, "samples": 10 }, "sell": { "avg": 2.1, "samples": 10 } }
+        }
+      }
     }
   }
 }
 ```
 
+- Event-Typ-Durchschnitte auf Source- und Spieler-Ebene
 - Spieler ohne Aktivität seit 14 Tagen werden entfernt
 - EMA-Flush alle 10 Minuten
+- Rückwärtskompatibel: fehlende `types`-Felder werden beim nächsten Flush ergänzt
 
 ---
 
 ## Admin-Korrekturen: `llm_notes.txt`
 
-Wird bei jedem Chat-Aufruf an den System-Prompt angehängt:
+Wird bei jedem Aufruf (Chat + Monitor) an den System-Prompt angehängt:
 - Fahrzeuge: `act_cars.txt` ist primäre Quelle, nicht DB
 - Fahrzeugtypen beginnen mit "BPC_"
 - Performance-Daten in SCUM.log

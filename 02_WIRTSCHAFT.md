@@ -64,28 +64,36 @@ Reine Analytik — kein Einfluss auf Kontostände.
 
 - **Befehl:** `/kfz` (Aliases: auto, car) — zeigt Fahrzeuginfos (DM)
   - **Versicherte:** Versicherungsdetails + Despawn-Countdown + alle Fahrzeuge auf ihren Namen
-  - **Nicht versichert, aber verlinkt:** Alle abgeschlossenen Fahrzeuge (via owner_steam_id/owner_db_id aus carservice.db)
+  - **Nicht versichert, aber verlinkt:** Alle Fahrzeuge auf ihren Namen (direkt aus act_cars.txt via SteamID/database id)
   - **Fahrzeuglimit-Warnungen:** 2 ohne Lizenz, 3 mit Fuhrpark-Lizenz (l2), 5+ = schwerer Regelverstoß
+  - **Typ-Duplikat-Warnung:** Pro Fahrzeugtyp nur 1 Exemplar erlaubt (z.B. keine 2 Rager)
   - **Hinweise:** Abgelaufene Lizenz → `/lizenzen` erneuern; Keine Versicherung → `/tresor` kaufen
 - **Admin:** `/vers add/rem/list` — Versicherungsnummern (V#####) zuweisen/entfernen
 - **Background:** Pollt `act_cars.txt` alle 5 Min + File-Monitor alle 5 Sek
 - **Features:** Despawn-Countdown, Kartenlinks (scum-map.com) pro Fahrzeug, Fahrzeughistorie
-- **Fahrzeug-Mappings:** Rager, WolfsWagen, Laika, Dirtbike, Cruiser, RIS, Traktor, Citybike, Mountainbike, Barba, Dinghy, Floß, Sidecar, Kinglet Duster, Kinglet Mariner
+- **Fahrzeug-Mappings:** Rager, WolfsWagen, Laika, Dirtbike, Cruiser, Quad, Traktor, Citybike, Mountainbike, Holzboot, Schlauchboot, Floß, Motorrad mit Beiwagen, Flugzeug, Wasserflugzeug
+- **Besitzregel:** Ein Fahrzeug gilt als Eigentum bis ein anderer Spieler sein eigenes Schloss einsetzt oder das Fahrzeug zerstört wird. Schloss entfernen ≠ Besitz aufgeben. Entsorgung z.B. durch Versenken in Gewässer.
 
 | DB | Tabellen | Zugriff |
 |---|---|---|
 | `userdata.db` | insurance_id, steam_id, gamer_id, vehicle_* Spalten | Lesen + Schreiben |
-| `carservice.db` | vehicle_history, events, vehicles (owner_steam_id, owner_db_id) | Lesen (Fahrzeuge + Historie) |
+| `carservice.db` | vehicle_history, events | Lesen (nur Historie) |
 | `bank.db` | Lizenzen (l2 = Fuhrpark-Lizenz) | Lesen (Lizenz-Check) |
-| `act_cars.txt` | Aktive Fahrzeuge (Datei, deutsche Lokalzeit trotz Z-Suffix) | Lesen |
+| `act_cars.txt` | Aktive Fahrzeuge + Owner (primäre Datenquelle für Besitz) | Lesen |
 
 ### vehicle_monitor.py (Cog)
-**Fahrzeuglimit-Monitor** — postet Verstöße automatisch in einen Admin-Channel.
+**Fahrzeuglimit-Monitor** — postet Verstöße automatisch in einen Admin-Channel und benachrichtigt Spieler per DM.
 
 - **Trigger:** Änderung an `act_cars.txt`, max. 1x pro Stunde
-- **Logik:** Gruppiert alle Fahrzeuge pro Owner aus carservice.db, prüft Fuhrpark-Lizenz (l2) aus bank.db
-- **Verstöße:** >2 Fahrzeuge ohne Lizenz, >3 mit Lizenz, 5+ = schwerer Regelverstoß
-- **Ausgabe:** Embed in Admin-Channel mit Spielername, SteamID, Lizenzstatus, Fahrzeugliste
+- **Logik:** Gruppiert alle Fahrzeuge pro Owner direkt aus act_cars.txt (SteamID + database id), prüft Fuhrpark-Lizenz (l2) aus bank.db
+- **Verstöße:**
+  - **Anzahl:** >2 Fahrzeuge ohne Lizenz, >3 mit Lizenz, 5+ = schwerer Regelverstoß
+  - **Typ-Duplikate:** Mehrere Fahrzeuge desselben Typs (z.B. 2x Rager, 2x Laika)
+- **Ausgabe:** Embed in Admin-Channel mit Spielername, SteamID, Lizenzstatus, Fahrzeugliste, Duplikat-Info
+- **DM-Benachrichtigung:** Verlinkte Spieler werden automatisch per DM über Verstöße informiert
+  - **Fingerprint-Tracking:** Nur bei neuer Verstoß-Konstellation (andere Fahrzeug-IDs) oder nach 3 Tagen erneut
+  - **Persistent:** Tracking in `ini/vehicle_monitor_tracking.json` (überlebt Bot-Neustarts)
+  - **DM-Report:** Zusammenfassung im Mod-Channel (wer benachrichtigt / DMs deaktiviert / bereits informiert / nicht verlinkt)
 - **Channel:** `cfg.discord_conf.channels.vehicle_monitor`
 
 ---

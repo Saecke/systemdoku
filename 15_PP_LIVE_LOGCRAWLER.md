@@ -317,9 +317,24 @@ LogSCUM: Global Stats:, FPS, TPS, Characters, Prisoners,
 C:, P:, Z:, R:, S:, A:, V:, IV:, NO:
 ```
 
-### Timestamp-Korrektur
-- `time_offset_hours: 1` — wird auf alle Timestamps addiert
-- `scum_time_offset_hours: 1` — separater Offset für SCUM.log
+### Timestamp-Korrektur (DST-aware)
+
+**Automatischer Modus** (`convert_to_local_time = true`):
+Offsets werden dynamisch aus Zeitzonen berechnet — Sommer-/Winterzeit wird automatisch berücksichtigt.
+
+| Config-Key | Default | Beschreibung |
+|---|---|---|
+| `server_timezone` | `UTC` | Zeitzone der non-SCUM Logs (chat, login, economy, etc.) |
+| `scum_server_timezone` | `Europe/Berlin` | Zeitzone der SCUM Engine-Log (Server-Systemuhr) |
+| `local_timezone` | `auto` | Lokale Zeitzone (`auto` = System-Erkennung) |
+
+**Hintergrund:** Non-SCUM Logs kommen in UTC, die SCUM Engine loggt in der Server-Systemzeit (Europe/Berlin). Da SCUM und lokale Zeitzone identisch sind, ist der SCUM-Offset immer 0.
+
+**Statischer Fallback** (`convert_to_local_time = false` oder kein zoneinfo/pytz):
+- `time_offset_hours: 1` — Offset für non-SCUM Logs (UTC → CET)
+- `scum_time_offset_hours: 0` — Offset für SCUM.log (bereits in CET)
+
+Unterstützte Timestamp-Formate: `YYYY.MM.DD-HH.MM.SS` (SCUM-dotted) und `YYYY-MM-DD HH:MM:SS` (ISO).
 
 ---
 

@@ -17,8 +17,14 @@ Der LLM Admin Bot ist ein KI-gestützter Server-Assistent mit zwei Betriebsmodi:
 ```
 Discord-Kanal (Admin-Chat)
     ↓ on_message
+    ├── Reply auf Bot oder Bild? → Heuristik + Relevanz überspringen
+    ├── Bild-Attachment? → Pillow JPEG-Konvertierung + Vision-Format
     ├── Quick Heuristic (Regex: Fragezeichen, "wer/wo/wann/wie...")
     ├── LLM Relevance Check ("ja"/"nein")
+    ├── Kontext:
+    │   ├── message.reference → Reply-Chain (max 10 Nachrichten rückwärts,
+    │   │     3s Timeout, nur gleicher User + Bot, kein eigener State)
+    │   └── Kein Reference → Channel-History (Fallback)
     └── Tool-Call-Loop (bis max_tool_rounds):
         ├── LLM wählt Tool → ToolExecutor führt aus
         ├── Ergebnis zurück an LLM
@@ -253,9 +259,9 @@ Wird pro Spieler+Quelle+Typ als EMA getrackt → "Spieler hat 6x mehr Verkäufe 
 
 ## Admin-Korrekturen: `llm_notes.txt`
 
-Wird bei jedem Aufruf (Chat + Monitor) an den System-Prompt angehängt:
+Hot-Reload: Wird bei jedem Aufruf (Chat + Monitor) frisch gelesen wenn geändert — kein Neustart nötig.
 - Fahrzeuge: `act_cars.txt` ist primäre Quelle, nicht DB
-- Fahrzeugtypen beginnen mit "BPC_"
+- Fahrzeugtypen: ausgelagert in `vehicle_types.txt` (per Tool abrufbar), beginnen mit "BPC_"
 - Performance-Daten in SCUM.log
 - Lizenz-Daten in der Vergangenheit = abgelaufen
 - TPS = 30 optimal (nicht "FPS" sagen)

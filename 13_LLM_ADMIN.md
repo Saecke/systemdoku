@@ -1,6 +1,6 @@
 # Bereich: LLM Admin Bot (llm_admin/)
 
-**Status: In Entwicklung — geht bald live**
+**Status: Live**
 
 ## Übersicht
 
@@ -17,7 +17,8 @@ Der LLM Admin Bot ist ein KI-gestützter Server-Assistent mit zwei Betriebsmodi:
 ```
 Discord-Kanal (Admin-Chat)
     ↓ on_message
-    ├── Reply auf Bot oder Bild? → Heuristik + Relevanz überspringen
+    ├── Reply auf Bot/Monitor-Alert? → Heuristik + Relevanz überspringen
+    │     (Monitor-Alerts werden als Kontext einbezogen bei depth 0)
     ├── Bild-Attachment? → Pillow JPEG-Konvertierung + Vision-Format
     ├── Quick Heuristic (Regex: Fragezeichen, "wer/wo/wann/wie...")
     ├── LLM Relevance Check ("ja"/"nein")
@@ -102,6 +103,28 @@ Log-Analyzer (LLM mit MONITOR_PROMPT + Tools)
 | squads | `ini/squads.txt` | Squad-Listen |
 | economy | `ini/EconomyOverride.json` | Händler-/Item-Overrides |
 | vehicles | `ini/act_cars.txt` | Fahrzeugbestand |
+| vehicle_types | `vehicle_types.txt` | BPC-/BP-Codes → deutsche Fahrzeugnamen |
+
+### Wissensdatenbank
+
+| Key | Wert |
+|---|---|
+| knowledge_path | `knowledge/` (lokales Verzeichnis) |
+
+Verzeichnis mit .txt-Dateien zu SCUM-Spielwissen (Crafting, Items, Mechaniken, Händler etc.).
+Wird NICHT in jeden Prompt geladen, sondern per Tool-Call nur bei Bedarf abgerufen.
+Neue Dateien einfach ins Verzeichnis legen — werden automatisch erkannt, kein Neustart nötig.
+
+### Gedächtnis
+
+| Key | Wert |
+|---|---|
+| notes_file | `llm_notes.txt` (manuell, Hot-Reload) |
+| memory_file | `llm_memory.txt` (vom Bot beschrieben, einzige Schreibdatei) |
+
+- **llm_notes.txt**: Admin-Korrekturen/Hinweise, manuell editiert, in jedem Prompt geladen
+- **llm_memory.txt**: Vom Bot selbst per `save_memory`/`delete_memory` Tools beschrieben.
+  Format: `[YYYY-MM-DD HH:MM | Adminname] Notiz`. Max 50KB. Hot-Reload.
 
 ### Monitor
 
@@ -118,46 +141,76 @@ Log-Analyzer (LLM mit MONITOR_PROMPT + Tools)
 | restart_grace_minutes | 10 |
 | restart_grace_sources | ["login.log", "violations.log"] |
 
-### Monitor-Quellen (10 Stück)
+### Monitor-Quellen (11 Stück)
 
 | Datei | TTL | Keep-Patterns |
 |---|---|---|
 | SCUM.log | 300s | battleye, ddos, ban, kick, cheat, tps, fps, global stats, error, crash etc. |
 | economy.log | 900s | — (alles) |
 | login.log | 600s | — |
-| chat.log | 600s | — |
-| gameplay.log | 600s | — |
-| kill.log | 600s | — |
-| quests.log | 600s | — |
+| kill.log | 1200s | — |
+| chat.log | 900s | — |
+| gameplay.log | 300s | — |
 | chest_ownership.log | 600s | — |
-| event_kill.log | 600s | — |
-| vehicle_destruction.log | 600s | — |
+| event_kill.log | 1200s | — |
+| quests.log | 300s | — |
+| vehicle_destruction.log | 900s | — |
+| violations.log | 900s | — |
 
 ---
 
-## 12 Tools (Function Calling)
+## 20 Tools (Function Calling)
+
+Tool-Beschreibungen sind bewusst kompakt (1-2 Sätze) für das 9B-Kontextfenster.
+Der System-Prompt enthält zusätzlich eine kompakte Tool-Übersicht mit "Wann welches Tool"-Zuordnung.
+
+### Spieler & Squads
 
 | Tool | Parameter | Funktion |
 |---|---|---|
 | `get_player_profile` | identifier (Name/SteamID/GamerID) | Komplettes Profil aus allen DBs |
+| `get_squad_profiles` | identifier (Squad-Name/ID) | Alle Mitglieder eines Squads mit Profilen |
 | `run_query` | db_name, sql | Custom SELECT (Read-Only, validiert) |
 | `get_db_schema` | — | Alle Tabellen-Strukturen |
 | `get_server_stats` | — | Schnellübersicht (Spieler, Konten, Squads, etc.) |
+| `get_server_status` | — | Live-Status aus SCUM.log Healthline (Spieler, TPS, Zombies, Fahrzeuge) |
+
+### Logs
+
+| Tool | Parameter | Funktion |
+|---|---|---|
 | `preview_logs` | — | Alle Log-Dateien + erste Zeilen |
 | `search_logs` | keywords[] | Keyword-Suche über alle Logs |
 | `read_log_file` | filename | Tail einer Log-Datei (500 Zeilen) |
 | `search_log_file` | filename, keywords[] | Keyword-Suche in einer Datei |
+| `search_logs_timerange` | filename, start_time, end_time, keywords[]? | Zeitfenster-Suche ("18:00" bis "20:00") |
+| `player_timeline` | identifier, start_time, end_time | Chronologische Timeline aus ALLEN Logs (Forensik) |
+
+### Regeln & Wissen
+
+| Tool | Parameter | Funktion |
+|---|---|---|
 | `search_rules` | keywords[] | Suche in Regeldateien mit Kontext |
 | `get_file_content` | name | Komplette Regeldatei lesen |
 | `count_lines` | name | Zeilen zählen |
 | `count_matches` | name, keyword | Treffer zählen |
+| `search_knowledge` | keywords[] | Keyword-Suche in der SCUM-Wissensdatenbank |
+| `get_knowledge_topic` | name | Komplettes Wissensthema lesen |
+
+### Monitor & Gedächtnis
+
+| Tool | Parameter | Funktion |
+|---|---|---|
+| `get_baselines` | — | Gelernte Aktivitäts-Baselines (Durchschnitte, Top-Spieler) |
+| `save_memory` | note, author | Notiz im Bot-Gedächtnis speichern |
+| `delete_memory` | keyword | Notiz aus Gedächtnis löschen |
 
 ---
 
-## Sicherheit (3 Schichten, hardcoded)
+## Sicherheit (4 Schichten, hardcoded)
 
 ### Schicht 1: Pfad-Whitelist
-- Beim Start: alle DB-Pfade, Log-Ordner, Regel-Dateien registrieren
+- Beim Start: alle DB-Pfade, Log-Ordner, Regel-Dateien, Knowledge-Verzeichnis registrieren
 - `lock_whitelist()` → danach unveränderlich
 - Jeder Dateizugriff wird gegen Whitelist geprüft
 - Subdirectories sind NICHT erlaubt (nur exakte Pfade + direkte Dateien)
@@ -170,6 +223,12 @@ Log-Analyzer (LLM mit MONITOR_PROMPT + Tools)
 - `safe_execute()` blockiert: INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, REPLACE, ATTACH, DETACH, REINDEX, VACUUM
 - Nur SELECT, PRAGMA, EXPLAIN erlaubt
 - Blockierte Versuche werden geloggt
+
+### Schicht 4: Dateischreiben (nur Memory)
+- GENAU EINE Datei darf beschrieben werden: `llm_memory.txt`
+- Registriert per `register_writable_path()`, nach `lock_whitelist()` unveränderlich
+- `safe_append_text()` / `safe_write_text()` prüfen strikt gegen diesen einen Pfad
+- Max 50KB Größenlimit
 
 ---
 
@@ -207,7 +266,7 @@ Wird pro Spieler+Quelle+Typ als EMA getrackt → "Spieler hat 6x mehr Verkäufe 
 
 ### Deduplizierung (Analyzer)
 - **Event-Level:** Bereits analysierte Events werden nicht erneut gesendet, max 25 Kontext-Zeilen
-- **Alert-Level:** Gemeldete Spieler bekommen 30 Min Cooldown. LLM wird informiert, diese nicht erneut zu melden (außer bei neuem, anderem Vergehen). Verhindert Alarm-Spam.
+- **Alert-Level:** Gemeldete Spieler bekommen 30 Min Cooldown mit **Grund + Uhrzeit**. LLM erhält: `- <steam_id>: um HH:MM gemeldet für "Grund"` — kann so zwischen bereits gemeldetem und neuem Verhalten unterscheiden. Events vor dem Meldezeitpunkt gelten als bekannt.
 - "Keine Auffälligkeiten" → kurze Status-Meldung im Channel (statt Stille)
 
 ### Was KEIN Alarm ist (im MONITOR_PROMPT definiert)
@@ -299,7 +358,13 @@ llm_admin (LM Studio + Discord Bot)
     │   ├── ini/EconomyOverride.json (Händler-Config)
     │   └── ini/act_cars.txt ← onclipactions.ahk
     │
-    └── SCHREIBT: Nichts (rein lesend)
+    ├── LOKAL (im llm_admin/-Ordner):
+    │   ├── llm_notes.txt (Admin-Hinweise, manuell gepflegt)
+    │   ├── llm_memory.txt (Bot-Gedächtnis, EINZIGE Schreibdatei)
+    │   ├── knowledge/*.txt (SCUM-Wissensdatenbank)
+    │   └── monitor_baseline.json (gelernte Aktivitätsmuster)
+    │
+    └── SCHREIBT: Nur llm_memory.txt (max 50KB, per save_memory/delete_memory Tools)
 ```
 
 → Datenquellen: [02_WIRTSCHAFT.md](02_WIRTSCHAFT.md) (bank.db), [04_SPIELER_IDENTITAET.md](04_SPIELER_IDENTITAET.md) (userdata.db), [10_EXTERNE_TOOLS.md](10_EXTERNE_TOOLS.md) (PP-Logcrawler Logs)

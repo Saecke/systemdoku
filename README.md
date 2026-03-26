@@ -26,6 +26,7 @@ Ein Komplex aus **50+ Discord-Bot-Modulen**, **8 Standalone-Bots**, **10 AutoHot
 | 13 | [LLM Admin Bot](13_LLM_ADMIN.md) | KI-Assistent mit Anomalie-Erkennung (in Entwicklung) |
 | 14 | [RCON-Zukunft](14_RCON_ZUKUNFT.md) | Vorbereitung auf RCON-Integration |
 | 15 | [PP-Live-Logcrawler](15_PP_LIVE_LOGCRAWLER.md) | Konsolen-Crawler, Health-Monitoring, Crash-Detection |
+| 16 | [Cogs-Referenz](16_COGS_REFERENZ.md) | Lade-Architektur, Ladezustand, Patterns, Abhaengigkeiten |
 
 ## Einstieg
 

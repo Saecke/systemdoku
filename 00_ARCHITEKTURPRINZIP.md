@@ -198,6 +198,17 @@ Vorbereitung auf RCON-Support durch die SCUM-Entwickler.
 
 ---
 
+### 16 — [Cogs-Referenz](16_COGS_REFERENZ.md)
+Technische Referenz des Cog-Systems im Haupt-Bot.
+- **Lade-Architektur:** bot_infobot.py → loader.py → cfg.startup_cogs → bot.load_extension()
+- **Ladezustand:** 42 aktive, 4 deaktivierte, 4 nicht eingebundene Cogs (Stand Maerz 2026)
+- **Gemeinsame Patterns:** Grundstruktur, Config-Zugriff, DB-Zugriff, Background-Tasks, on_message, persistente Embeds
+- **Implizite Abhaengigkeiten:** Shared Bot-Attribute, geteilte Datenbanken, on_message-Ketten, dateibasierte Kommunikation
+- **Config-Namespaces:** Alle `cfg.*` Namespaces im Ueberblick (paths, discord_conf, tunables, features, etc.)
+- **Cog hinzufuegen/entfernen:** Anleitung fuer Aktivierung, Deaktivierung, Laufzeit-Steuerung
+
+---
+
 ### 13 — [LLM Admin Bot](13_LLM_ADMIN.md) *(in Entwicklung)*
 KI-gestützter Server-Assistent mit Anomalie-Erkennung.
 - **Chat-Assistent:** Reaktiv auf Admin-Fragen, LM Studio lokal (Qwen 3.5 9B), 12 Tools (DB-Abfragen, Log-Suche, Regeln)

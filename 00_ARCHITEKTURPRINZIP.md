@@ -256,7 +256,7 @@ Alle Cogs werden dynamisch über `_modules/loader.py` geladen und können einzel
 | TradeStats | trade_stats.py | Trade-Log-Parsing → Analytik-DB | [02](02_WIRTSCHAFT.md) |
 | Insurance | insurance.py | KFZ-Versicherung & Fahrzeugübersicht, Despawn, Owner-Fahrzeuge, Lizenz-Warnungen | [02](02_WIRTSCHAFT.md) |
 | CheckInsurance | check_insurance.py | Admin: V-Nummern zuweisen/entfernen | [02](02_WIRTSCHAFT.md) |
-| VehicleMonitor | vehicle_monitor.py | Automatischer Fahrzeuglimit-Monitor → Admin-Channel (max 1x/h) | [02](02_WIRTSCHAFT.md) |
+| VehicleMonitor | vehicle_monitor.py | Fahrzeuglimit-Monitor mit Grace Period, DM + Admin-Channel, Status-Abfrage | [02](02_WIRTSCHAFT.md) |
 | Lizenzen | lizenzen.py | Banker/Fleet/Bau-Lizenzen kaufen | [02](02_WIRTSCHAFT.md) |
 | Donations | donations.py | PayPal-Spenden, Sponsor-Rollen | [02](02_WIRTSCHAFT.md) |
 

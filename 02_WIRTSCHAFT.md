@@ -90,10 +90,14 @@ Reine Analytik — kein Einfluss auf Kontostände.
   - **Anzahl:** >2 Fahrzeuge ohne Lizenz, >3 mit Lizenz, 5+ = schwerer Regelverstoß
   - **Typ-Duplikate:** Mehrere Fahrzeuge desselben Typs (z.B. 2x Rager, 2x Laika)
 - **Ausgabe:** Embed in Admin-Channel mit Spielername, SteamID, Lizenzstatus, Fahrzeugliste, Duplikat-Info
-- **DM-Benachrichtigung:** Verlinkte Spieler werden automatisch per DM über Verstöße informiert
+- **Grace Period:** Verstöße werden erst nach mind. 5 Sichtungen UND 24h bestätigt - verhindert Fehlalarme durch Wracks (bis 2h), Fahrzeugtausch etc.
+  - **Persistent:** Beobachtungs-Tracking in `ini/vehicle_monitor_pending.json`
+  - Löst sich ein Verstoß vorher auf, wird der Eintrag automatisch entfernt
+- **DM-Benachrichtigung:** Verlinkte Spieler werden automatisch per DM über bestätigte Verstöße informiert
   - **Fingerprint-Tracking:** Nur bei neuer Verstoß-Konstellation (andere Fahrzeug-IDs) oder nach 3 Tagen erneut
   - **Persistent:** Tracking in `ini/vehicle_monitor_tracking.json` (überlebt Bot-Neustarts)
   - **DM-Report:** Zusammenfassung im Mod-Channel (wer benachrichtigt / DMs deaktiviert / bereits informiert / nicht verlinkt)
+- **Status-Abfrage:** Mods/Admins können im Channel das Wort `status` schreiben und erhalten eine Live-Übersicht (bestätigte Verstöße, beobachtete Spieler mit Fortschritt, Tracking-Stats)
 - **Channel:** `cfg.discord_conf.channels.vehicle_monitor`
 
 ---

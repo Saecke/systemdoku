@@ -40,7 +40,7 @@ Alle Spieler-Interaktionen laufen über Discord (Befehle, Buttons, Dropdowns) od
 | Befehl | Aliases | Cog | Was der Spieler sieht |
 |---|---|---|---|
 | `/tresor` | Bank, bank, t, T | bank.py | Gold-Kontostand, letzte 20 Transaktionen, Voice-Reward-Status |
-| `/lizenzen` | license, lizenz, l, L | lizenzen.py | Aktive Lizenzen, Kaufmenü per Reaktion (💳🚗🏗️) |
+| `/lizenzen` | license, lizenz, l, L | lizenzen.py | Aktive Lizenzen, Kaufmenü per Reaktion (💳🚗🏗️), Multi-Wochen-Kauf (1-8 Wochen) |
 | `/kfz` | auto, car, Car, KFZ | insurance.py | Fahrzeugtyp, ID, Kartenlinks, Despawn-Countdown, Versicherungsstatus, alle Fahrzeuge auf dem Namen (aus act_cars.txt), Fuhrpark-Lizenz-Warnungen (2/3/5+), Typ-Duplikat-Warnung (max 1 pro Typ), `/tresor`-Hinweis für Nicht-Versicherte |
 | `/flugzeug` | plane, flieger, Flieger | aircraft.py | Flugzeug-Auswahl, Preise, Kauf-Flow (Standort-Prüfung + Gold abziehen) |
 | `/spende` | spenden | donations.py | Spendenguide, PayPal-Link, Transaktions-ID einlösen |

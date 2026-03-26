@@ -65,13 +65,13 @@ Reine Analytik — kein Einfluss auf Kontostände.
 - **Befehl:** `/kfz` (Aliases: auto, car) — zeigt Fahrzeuginfos (DM)
   - **Versicherte:** Versicherungsdetails + Despawn-Countdown + alle Fahrzeuge auf ihren Namen
   - **Nicht versichert, aber verlinkt:** Alle Fahrzeuge auf ihren Namen (direkt aus act_cars.txt via SteamID/database id)
-  - **Fahrzeuglimit-Warnungen:** 2 ohne Lizenz, 3 mit Fuhrpark-Lizenz (l2), 5+ = schwerer Regelverstoß
+  - **Fahrzeuglimit-Warnungen:** 2 ohne Lizenz, 3 mit Fuhrpark-Lizenz (l2), 5+ = schwerer Regelverstoß (Fahrräder und Schubkarren zählen nicht zum Limit)
   - **Typ-Duplikat-Warnung:** Pro Fahrzeugtyp nur 1 Exemplar erlaubt (z.B. keine 2 Rager)
   - **Hinweise:** Abgelaufene Lizenz → `/lizenzen` erneuern; Keine Versicherung → `/tresor` kaufen
 - **Admin:** `/vers add/rem/list` — Versicherungsnummern (V#####) zuweisen/entfernen
 - **Background:** Pollt `act_cars.txt` alle 5 Min + File-Monitor alle 5 Sek
 - **Features:** Despawn-Countdown, Kartenlinks (scum-map.com) pro Fahrzeug, Fahrzeughistorie
-- **Fahrzeug-Mappings:** Rager, WolfsWagen, Laika, Dirtbike, Cruiser, Quad, Traktor, Citybike, Mountainbike, Holzboot, Schlauchboot, Floß, Motorrad mit Beiwagen, Flugzeug, Wasserflugzeug
+- **Fahrzeug-Mappings:** Rager, WolfsWagen, Laika, Dirtbike, Cruiser, Quad, Traktor, Citybike, Mountainbike, Holzboot, Schlauchboot, Floß, Motorrad mit Beiwagen, Flugzeug, Wasserflugzeug, Schubkarre (improvisiert), Schubkarre (Metall)
 - **Besitzregel:** Ein Fahrzeug gilt als Eigentum bis ein anderer Spieler sein eigenes Schloss einsetzt oder das Fahrzeug zerstört wird. Schloss entfernen ≠ Besitz aufgeben. Entsorgung z.B. durch Versenken in Gewässer.
 
 | DB | Tabellen | Zugriff |
@@ -89,6 +89,7 @@ Reine Analytik — kein Einfluss auf Kontostände.
 - **Verstöße:**
   - **Anzahl:** >2 Fahrzeuge ohne Lizenz, >3 mit Lizenz, 5+ = schwerer Regelverstoß
   - **Typ-Duplikate:** Mehrere Fahrzeuge desselben Typs (z.B. 2x Rager, 2x Laika)
+  - **Ausgenommen:** Fahrräder (Citybike, Mountainbike) und Schubkarren zählen nicht als Fahrzeug
 - **Ausgabe:** Embed in Admin-Channel mit Spielername, SteamID, Lizenzstatus, Fahrzeugliste, Duplikat-Info
 - **Grace Period:** Verstöße werden erst nach mind. 5 Sichtungen UND 24h bestätigt - verhindert Fehlalarme durch Wracks (bis 2h), Fahrzeugtausch etc.
   - **Persistent:** Beobachtungs-Tracking in `ini/vehicle_monitor_pending.json`
@@ -103,12 +104,13 @@ Reine Analytik — kein Einfluss auf Kontostände.
 ---
 
 ### lizenzen.py (Cog)
-**Lizenzverwaltung** — 7-Tage-Lizenzen kaufen/verlängern.
+**Lizenzverwaltung** — Lizenzen kaufen/verlängern (Multi-Wochen-Kauf).
 
 - **Befehl:** `/lizenzen` (Aliases: license, l) — Lizenz-Kaufmenü (DM)
 - **Auswahl per Reaktion:** 💳 Banker (l1), 🚗 Fleet (l2), 🏗️ Building (l3)
-- **Kosten:** `cfg.gold_cost_per_license` Gold pro Lizenz
-- **Laufzeit:** `cfg.license_duration_days` (Standard: 7 Tage)
+- **Multi-Wochen-Kauf:** Nach Lizenztyp-Auswahl fragt der Bot nach gewünschter Wochenzahl (1-8), zeigt Preistabelle, Bestätigung per Reaktion
+- **Kosten:** `cfg.gold_cost_per_license` Gold pro Woche (Standard: 5 Gold)
+- **Laufzeit:** `cfg.license_duration_days` pro Woche (Standard: 7 Tage), Mehrfachkauf verlängert
 
 | DB | Tabellen | Zugriff |
 |---|---|---|

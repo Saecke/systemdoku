@@ -55,40 +55,40 @@ Fehlgeschlagene Cogs blockieren nicht den Start - sie werden geloggt und uebersp
 | 13 | squad | Kommunikation |
 | 14 | lizenzen | Wirtschaft |
 | 15 | bank | Wirtschaft |
-| 16 | purge | Events |
-| 17 | game_events | Events |
-| 18 | hooks | Kommunikation |
-| 19 | voice_rewards | Tracking |
-| 20 | health | Admin |
-| 21 | bootstrap | Admin |
-| 22 | audit | Admin |
-| 23 | maintenance | Admin |
-| 24 | statbot | Tracking |
-| 25 | cleanup_messages | Admin |
-| 26 | server_status | Tracking |
-| 27 | chat_bridge | Kommunikation |
-| 28 | cars_uploader | Wirtschaft |
-| 29 | trader_status | Tracking |
-| 30 | trade_stats | Wirtschaft |
-| 31 | team_sync | Admin |
-| 32 | inselkom | Kommunikation |
-| 33 | kill_feed | Tracking |
-| 34 | npczones | Events |
-| 35 | fishing | Events |
-| 36 | events_stats | Events |
-| 37 | awards | Events |
-| 38 | donations | Wirtschaft |
-| 39 | router | Kommunikation |
-| 40 | handelshaus | Wirtschaft |
-| 41 | link_translator | Spieler |
-| 42 | vehicle_monitor | Wirtschaft |
+| 16 | carservice | Wirtschaft |
+| 17 | purge | Events |
+| 18 | game_events | Events |
+| 19 | hooks | Kommunikation |
+| 20 | voice_rewards | Tracking |
+| 21 | health | Admin |
+| 22 | bootstrap | Admin |
+| 23 | audit | Admin |
+| 24 | maintenance | Admin |
+| 25 | statbot | Tracking |
+| 26 | cleanup_messages | Admin |
+| 27 | server_status | Tracking |
+| 28 | chat_bridge | Kommunikation |
+| 29 | cars_uploader | Wirtschaft |
+| 30 | trader_status | Tracking |
+| 31 | trade_stats | Wirtschaft |
+| 32 | team_sync | Admin |
+| 33 | inselkom | Kommunikation |
+| 34 | kill_feed | Tracking |
+| 35 | npczones | Events |
+| 36 | fishing | Events |
+| 37 | events_stats | Events |
+| 38 | awards | Events |
+| 39 | donations | Wirtschaft |
+| 40 | router | Kommunikation |
+| 41 | handelshaus | Wirtschaft |
+| 42 | link_translator | Spieler |
+| 43 | vehicle_monitor | Wirtschaft |
 
 ### Deaktivierte Cogs (auskommentiert in startup_cogs)
 
 | Extension | Grund |
 |-----------|-------|
 | aircraft | Derzeit nicht im Einsatz |
-| carservice | Derzeit nicht im Einsatz |
 | map_event_challenges | Derzeit nicht im Einsatz |
 | bunker | Derzeit nicht im Einsatz |
 

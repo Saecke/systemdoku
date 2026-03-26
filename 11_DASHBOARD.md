@@ -65,26 +65,20 @@ Das Dashboard unter `scumsaecke.de/dash/` ist eine **rein lesende Visualisierung
 
 ---
 
-### /kfz — Fahrzeugversicherung & Fahrzeugübersicht
-**Was der Spieler sieht (je nach Status):**
+### /kfz — Fahrzeugversicherung & Fuhrpark
+**Zwei Bereiche (immer sichtbar für verlinkte Spieler):**
 
-**Versichert mit aktivem Fahrzeug:**
-- Versicherungsnummer, Fahrzeug-ID, Fahrzeugtyp (15 Typen gemappt)
-- Despawn-Countdown, Kartenlink (scum-map.com)
-- Fahrzeug-Historie (Events, letzte 10)
-- Versicherte Fahrzeuge unter der V-Nummer (letzte 10)
-- Alle Fahrzeuge auf dem Spieler-Namen (aktiv, mit Kartenlinks)
+**Versicherungs-Karte** (oben, je nach Status):
+- Versichert: Versicherungsnummer, Fahrzeug-ID, Fahrzeugtyp (18 Typen gemappt inkl. Schubkarren), Despawn-Countdown, Kartenlink
+- Nicht versichert: Info-Box mit Hinweisen zur Versicherung
+
+**Fuhrpark-Karte** (unten, immer sichtbar):
+- Limit-Anzeige: z.B. "2/2 Fahrzeuge" oder "1/3 Fahrzeuge (Fuhrpark-Lizenz aktiv bis ...)"
+- Tabelle aller Fahrzeuge: ID, Typ, Zuletzt gesehen, Versicherungsnummer, Kartenlink
+- Fahrräder/Schubkarren in der Liste aber ausgegraut, zählen nicht zum Limit
 - Fuhrpark-Lizenz-Warnungen (2 ohne Lizenz, 3 mit l2, 5+ = schwerer Verstoß)
-
-**Versichert ohne aktives Fahrzeug:**
-- Versicherungsnummer + Hinweis "kein Fahrzeug zugewiesen"
-- Alle Fahrzeuge auf dem Spieler-Namen (via owner_steam_id/owner_db_id)
-- Kartenlinks pro Fahrzeug, Lizenz-Warnungen
-
-**Nicht versichert, aber verlinkt:**
-- Alle abgeschlossenen Fahrzeuge auf dem Namen (Typ, Zuletzt benutzt, Kartenlink)
-- Hinweis: Versicherung über `/tresor` erhältlich
-- Lizenz-Warnungen bei zu vielen Fahrzeugen
+- Typ-Duplikat-Warnung (max 1 pro Typ)
+- Hinweis bei vollem Limit ohne Lizenz: `/lizenzen` im Discord
 
 | Datenquelle | Tabelle | Felder |
 |---|---|---|

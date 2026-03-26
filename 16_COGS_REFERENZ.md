@@ -92,7 +92,9 @@ Fehlgeschlagene Cogs blockieren nicht den Start - sie werden geloggt und uebersp
 | map_event_challenges | Derzeit nicht im Einsatz |
 | bunker | Derzeit nicht im Einsatz |
 
-### Nicht eingebundene Cogs (Datei existiert, aber nicht in startup_cogs)
+### Nicht eingebundene Cogs (nur im Entwicklungsordner)
+
+Die folgenden Dateien existieren nur lokal im Entwicklungsordner und sind **nicht** auf dem Live-System vorhanden. Sie sind weder in `startup_cogs` eingetragen noch werden sie deployed.
 
 | Extension | Status |
 |-----------|--------|
@@ -100,6 +102,16 @@ Fehlgeschlagene Cogs blockieren nicht den Start - sie werden geloggt und uebersp
 | log_bridge | Durch inselkom ersetzt (erweiterter Log-Relay) |
 | router_v2 | Components v2 Variante, per Feature-Flag steuerbar |
 | rules | In extensions_meta gelistet, aber nicht in startup_cogs |
+
+### Backup-Dateien (nur im Entwicklungsordner)
+
+Lokale Sicherungskopien, existieren nicht auf dem Live-System.
+
+| Datei | Original |
+|-------|----------|
+| donations.py_bu | donations.py |
+| insurance.py_bu | insurance.py |
+| statbot.py_bu | statbot.py |
 
 ---
 
